@@ -609,7 +609,37 @@
             box-shadow: var(--shadow);
         }
 
-        /* Responsive Design */
+        /* Quantity Input */
+        .qty-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .qty-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Processing Indicator */
+        .processing-indicator {
+            text-align: center;
+            padding: 20px;
+            background: var(--background);
+            border-radius: 8px;
+            margin: 16px 0;
+            color: var(--text-secondary);
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .hidden { display: none !important; }
+        .visible { display: block !important; }
         @media (max-width: 1024px) {
             .charts-grid {
                 grid-template-columns: 1fr;
@@ -894,4 +924,3 @@
                                     <td>15 Box</td>
                                     <td>18 Box ⓘ</td>
                                     <td><input type="number" value="17" class="qty-input"></td>
-                                    
