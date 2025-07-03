@@ -1,14 +1,13 @@
-<!DOCTYPE html>
+function enableOrderExport() {
+            document.getElementById('exportKioskBtn').disable<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Godesi KIOSK Inventory Management</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/2.1.5/tesseract.min.js"></script>
     
     <style>
-        /* Complete Embedded CSS */
         :root {
             --primary-color: #3b82f6;
             --primary-dark: #2563eb;
@@ -38,7 +37,6 @@
             line-height: 1.6;
         }
 
-        /* Main App Layout */
         .app-container {
             display: flex;
             min-height: 100vh;
@@ -55,6 +53,7 @@
             height: 100vh;
             overflow-y: auto;
             box-shadow: var(--shadow);
+            z-index: 100;
         }
 
         .sidebar-header {
@@ -111,6 +110,8 @@
             transition: all 0.3s ease;
             border-left: 3px solid transparent;
             font-weight: 500;
+            cursor: pointer;
+            user-select: none;
         }
 
         .nav-item:hover {
@@ -356,18 +357,21 @@
             border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
+            display: none;
         }
 
         .upload-status.success {
             background: #dcfce7;
             color: var(--success-color);
             border: 1px solid #bbf7d0;
+            display: block;
         }
 
         .upload-status.error {
             background: #fef2f2;
             color: var(--danger-color);
             border: 1px solid #fecaca;
+            display: block;
         }
 
         /* Data Tables */
@@ -405,6 +409,12 @@
             background: rgba(59, 130, 246, 0.02);
         }
 
+        .data-table tbody tr:first-child td {
+            color: var(--text-secondary);
+            text-align: center;
+            font-style: italic;
+        }
+
         /* Buttons */
         .btn {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
@@ -432,6 +442,18 @@
 
         .btn-secondary:hover {
             box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+        }
+
+        .btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         /* Forms */
@@ -481,132 +503,29 @@
             box-shadow: var(--shadow);
         }
 
-        /* Filter Controls */
-        .filter-controls {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-controls select,
-        .filter-controls input {
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        /* Export Section */
-        .export-section {
-            background: var(--surface);
-            padding: 24px;
-            border-radius: 16px;
-            margin-top: 24px;
+        /* Empty State */
+        .empty-state {
             text-align: center;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
-        }
-
-        .export-section h4 {
-            margin-bottom: 16px;
-            color: var(--text-primary);
-        }
-
-        /* Reports Grid */
-        .reports-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-        }
-
-        .report-card {
-            background: var(--surface);
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .report-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .report-card h3 {
-            margin-bottom: 12px;
-            color: var(--text-primary);
-        }
-
-        .report-card p {
+            padding: 60px 20px;
             color: var(--text-secondary);
-            margin-bottom: 20px;
         }
 
-        /* Settings Grid */
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 24px;
-        }
-
-        .settings-section {
-            background: var(--surface);
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
-
-        .settings-section h3 {
+        .empty-state-icon {
+            font-size: 48px;
             margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
             color: var(--text-primary);
         }
 
-        .master-table-container {
-            margin-top: 16px;
-        }
-
-        /* Sales Data Viewer */
-        .sales-data-viewer {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 24px;
-            margin-top: 24px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
-        }
-
-        .sales-data-viewer h3 {
-            margin-bottom: 20px;
-            color: var(--text-primary);
-        }
-
-        /* Order Configuration */
-        .order-config {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
-        }
-
-        .order-config h3 {
-            margin-bottom: 20px;
-            color: var(--text-primary);
-        }
-
-        /* Order Results */
-        .order-results {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 24px;
-            margin: 24px 0;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
+        .empty-state p {
+            font-size: 14px;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
         /* Quantity Input */
@@ -626,20 +545,130 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        /* Processing Indicator */
-        .processing-indicator {
-            text-align: center;
-            padding: 20px;
-            background: var(--background);
-            border-radius: 8px;
-            margin: 16px 0;
-            color: var(--text-secondary);
+        /* Settings and Reports */
+        .settings-grid, .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
         }
 
-        /* Utility Classes */
-        .text-center { text-align: center; }
-        .hidden { display: none !important; }
-        .visible { display: block !important; }
+        .settings-section, .report-card {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .settings-section:hover, .report-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .settings-section h3, .report-card h3 {
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .report-card {
+            text-align: center;
+        }
+
+        .report-card p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .master-table-container {
+            margin-top: 16px;
+            display: none;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-controls select,
+        .filter-controls input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .sales-data-viewer {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .sales-data-viewer h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .order-config {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .order-config h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .order-results {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .export-section {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 16px;
+            margin-top: 24px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .export-section h4 {
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Responsive Design */
         @media (max-width: 1024px) {
             .charts-grid {
                 grid-template-columns: 1fr;
@@ -651,10 +680,12 @@
         }
 
         @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
             .sidebar {
                 transform: translateX(-100%);
-                position: fixed;
-                z-index: 1000;
                 transition: transform 0.3s ease;
             }
             
@@ -668,26 +699,11 @@
             }
             
             .top-bar {
-                padding: 16px 20px;
-                position: relative;
-            }
-            
-            .top-bar::before {
-                content: '☰';
-                position: absolute;
-                left: 20px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 20px;
-                cursor: pointer;
-                padding: 8px;
-                color: var(--primary-color);
+                padding: 16px 20px 16px 60px;
             }
             
             .page-title {
-                text-align: center;
                 font-size: 24px;
-                margin-left: 40px;
             }
             
             .content-area {
@@ -698,9 +714,7 @@
                 grid-template-columns: 1fr;
             }
             
-            .config-grid,
-            .reports-grid,
-            .settings-grid {
+            .config-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -708,8 +722,11 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+
         <!-- Sidebar -->
-        <nav class="sidebar">
+        <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">G</div>
                 <div class="sidebar-title">
@@ -720,31 +737,31 @@
             
             <div class="nav-section">
                 <div class="nav-section-title">Core</div>
-                <a href="#" class="nav-item active" data-tab="dashboard">Dashboard</a>
-                <a href="#" class="nav-item" data-tab="data-upload">Data Upload</a>
+                <div class="nav-item active" data-tab="dashboard">Dashboard</div>
+                <div class="nav-item" data-tab="data-upload">Data Upload</div>
             </div>
             
             <div class="nav-section">
                 <div class="nav-section-title">Operations</div>
-                <a href="#" class="nav-item" data-tab="sales-orders">Sales Orders</a>
-                <a href="#" class="nav-item" data-tab="stock-reconciliation">Stock Reconciliation</a>
-                <a href="#" class="nav-item" data-tab="stock-fulfillment">Stock Fulfillment</a>
-                <a href="#" class="nav-item" data-tab="grn-tracker">GRN Tracker</a>
+                <div class="nav-item" data-tab="sales-orders">Sales Orders</div>
+                <div class="nav-item" data-tab="stock-reconciliation">Stock Reconciliation</div>
+                <div class="nav-item" data-tab="stock-fulfillment">Stock Fulfillment</div>
+                <div class="nav-item" data-tab="grn-tracker">GRN Tracker</div>
             </div>
             
             <div class="nav-section">
                 <div class="nav-section-title">Analytics</div>
-                <a href="#" class="nav-item" data-tab="reports">Reports</a>
-                <a href="#" class="nav-item" data-tab="settings">Settings</a>
+                <div class="nav-item" data-tab="reports">Reports</div>
+                <div class="nav-item" data-tab="settings">Settings</div>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="main-content">
-            <div class="top-bar">
+            <div class="top-bar" id="topBar">
                 <div class="page-title" id="pageTitle">Dashboard</div>
                 <div class="date-info">
-                    <span id="currentDate"></span>
+                    <span id="currentDate">Loading...</span>
                 </div>
             </div>
 
@@ -757,35 +774,35 @@
                                 <div class="stat-title">Total Revenue</div>
                                 <div class="stat-icon blue">₹</div>
                             </div>
-                            <div class="stat-value" id="totalRevenue">₹2,45,670</div>
-                            <div class="stat-change positive">↗ +12.5% from last month</div>
+                            <div class="stat-value" id="totalRevenue">₹0</div>
+                            <div class="stat-change">No data uploaded yet</div>
                         </div>
 
                         <div class="stat-card">
                             <div class="stat-header">
-                                <div class="stat-title">Active Orders</div>
-                                <div class="stat-icon orange">📦</div>
+                                <div class="stat-title">Sales Records</div>
+                                <div class="stat-icon orange">📊</div>
                             </div>
-                            <div class="stat-value" id="activeOrders">1,847</div>
-                            <div class="stat-change positive">↗ +8.3% from last week</div>
+                            <div class="stat-value" id="salesRecords">0</div>
+                            <div class="stat-change">Upload sales data to see metrics</div>
                         </div>
 
                         <div class="stat-card">
                             <div class="stat-header">
-                                <div class="stat-title">Items in Stock</div>
-                                <div class="stat-icon green">📋</div>
+                                <div class="stat-title">Items Tracked</div>
+                                <div class="stat-icon green">📦</div>
                             </div>
-                            <div class="stat-value" id="itemsInStock">12,456</div>
-                            <div class="stat-change positive">↗ +5.7% from last month</div>
+                            <div class="stat-value" id="itemsTracked">0</div>
+                            <div class="stat-change">Upload inventory data to track</div>
                         </div>
 
                         <div class="stat-card">
                             <div class="stat-header">
-                                <div class="stat-title">Low Stock Alerts</div>
-                                <div class="stat-icon red">⚠️</div>
+                                <div class="stat-title">Active Stores</div>
+                                <div class="stat-icon red">🏪</div>
                             </div>
-                            <div class="stat-value" id="lowStockAlerts">23</div>
-                            <div class="stat-change negative">↘ -15.2% from last week</div>
+                            <div class="stat-value" id="activeStores">0</div>
+                            <div class="stat-change">Configure stores in Settings</div>
                         </div>
                     </div>
 
@@ -793,19 +810,26 @@
                         <div class="chart-card">
                             <div class="chart-header">
                                 <div class="chart-title">Sales Performance</div>
-                                <select class="chart-filter">
-                                    <option>Last 30 Days</option>
-                                    <option>Last 90 Days</option>
+                                <select class="chart-filter" disabled>
+                                    <option>No data available</option>
                                 </select>
                             </div>
-                            <canvas id="salesChart" width="400" height="200"></canvas>
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📈</div>
+                                <h3>No Sales Data</h3>
+                                <p>Upload sales data in the Data Upload tab to see performance charts</p>
+                            </div>
                         </div>
 
                         <div class="chart-card">
                             <div class="chart-header">
-                                <div class="chart-title">Stock Levels</div>
+                                <div class="chart-title">Stock Overview</div>
                             </div>
-                            <canvas id="stockChart" width="300" height="200"></canvas>
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📊</div>
+                                <h3>No Stock Data</h3>
+                                <p>Upload stock data to see inventory overview</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -833,10 +857,10 @@
                     <div class="sales-data-viewer">
                         <h3>Sales Data Viewer</h3>
                         <div class="filter-controls">
-                            <select id="storeFilter">
-                                <option value="">All Stores</option>
+                            <select id="storeFilter" disabled>
+                                <option value="">No stores configured</option>
                             </select>
-                            <input type="date" id="dateFilter">
+                            <input type="date" id="dateFilter" disabled>
                         </div>
                         <div class="data-table-container">
                             <table id="salesDataTable" class="data-table">
@@ -852,20 +876,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>2025-07-15</td>
-                                        <td>Downtown Store</td>
-                                        <td>Tea</td>
-                                        <td>Premium Tea Bags - 100ct</td>
-                                        <td>5</td>
-                                        <td>₹750</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2025-07-15</td>
-                                        <td>Mall Store</td>
-                                        <td>Coffee</td>
-                                        <td>Organic Coffee - 500g</td>
-                                        <td>3</td>
-                                        <td>₹600</td>
+                                        <td colspan="6">No data uploaded yet. Upload sales data to see records here.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -875,16 +886,25 @@
 
                 <!-- Sales Orders Tab -->
                 <div id="sales-orders" class="tab-content">
+                    <div class="upload-section">
+                        <h3>Current Stock Upload for Order Calculation</h3>
+                        <div class="upload-area" id="orderStockUploadArea">
+                            <p>📦 Drag & drop current stock file or click to browse</p>
+                            <input type="file" id="orderStockFileInput" accept=".csv,.xlsx" style="display: none;">
+                        </div>
+                        <div id="orderStockUploadStatus" class="upload-status"></div>
+                        <p style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);">
+                            💡 Upload current stock to calculate accurate order quantities using: <strong>Forecast + MOQ - Current Stock</strong>
+                        </p>
+                    </div>
+
                     <div class="order-config">
                         <h3>Sales Order Configuration</h3>
                         <div class="config-grid">
                             <div class="config-item">
                                 <label for="orderStore">Select Store:</label>
-                                <select id="orderStore">
-                                    <option value="">Choose a store...</option>
-                                    <option value="downtown">Downtown Store</option>
-                                    <option value="mall">Mall Store</option>
-                                    <option value="airport">Airport Store</option>
+                                <select id="orderStore" disabled>
+                                    <option value="">No stores configured</option>
                                 </select>
                             </div>
                             <div class="config-item">
@@ -892,35 +912,1076 @@
                                 <select id="forecastPeriod">
                                     <option value="last30">Last 30 Days</option>
                                     <option value="previousMonth">Previous Month</option>
+                                    <option value="last90">Last 90 Days</option>
                                 </select>
                             </div>
                             <div class="config-item">
-                                <button id="generateOrderBtn" class="btn">🔍 Generate Order</button>
+                                <label for="forecastMethod">Forecast Method:</label>
+                                <select id="forecastMethod">
+                                    <option value="average">Average Sales</option>
+                                    <option value="trending">Trending Analysis</option>
+                                    <option value="seasonal">Seasonal Adjustment</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <button id="generateOrderBtn" class="btn" disabled>🔍 Generate Order</button>
+                                <p style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);" id="orderGenStatus">Configure stores and upload data first</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="order-results">
-                        <table id="orderTable" class="data-table">
+                    <div class="order-results" id="orderResultsContainer">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🛒</div>
+                            <h3>No Orders Generated</h3>
+                            <p>Upload sales data and current stock, then click "Generate Order" to create forecasted orders</p>
+                        </div>
+                    </div>
+
+                    <div class="export-section">
+                        <h4>📤 Export Orders</h4>
+                        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                            <button id="exportKioskBtn" class="btn" disabled>Export KIOSK Order</button>
+                            <button id="exportQsrBtn" class="btn btn-secondary" disabled>Export QSR Order</button>
+                            <button id="exportExcelBtn" class="btn" disabled>Export Excel</button>
+                        </div>
+                        <p style="margin-top: 12px; font-size: 12px; color: var(--text-secondary);" id="exportStatus">Generate orders first to enable export</p>
+                    </div>
+                </div>
+
+                <!-- Stock Reconciliation Tab -->
+                <div id="stock-reconciliation" class="tab-content">
+                    <div class="upload-section">
+                        <h3>Manual Stock Check Upload</h3>
+                        <div class="upload-area" id="manualStockUploadArea">
+                            <p>📋 Drag & drop manual stock check file</p>
+                            <input type="file" id="manualStockFileInput" accept=".csv,.xlsx" style="display: none;">
+                        </div>
+                        <div id="manualStockUploadStatus" class="upload-status"></div>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>Item Name</th>
-                                    <th>Normal Forecast</th>
-                                    <th>Recommended Qty</th>
-                                    <th>Your Order Qty</th>
-                                    <th>Trend</th>
+                                    <th>System Stock</th>
+                                    <th>Physical Count</th>
+                                    <th>Variance</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><strong>Premium Tea Bags - 100ct</strong></td>
-                                    <td>30 Box</td>
-                                    <td>39 Box ⓘ</td>
-                                    <td><input type="number" value="32" class="qty-input"></td>
-                                    <td>↗️ increasing</td>
+                                    <td colspan="5">Upload manual stock check file to see reconciliation data</td>
                                 </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Stock Fulfillment Tab -->
+                <div id="stock-fulfillment" class="tab-content">
+                    <div class="order-config">
+                        <h3>Stock Fulfillment Orders</h3>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <label for="fulfillmentStore">Select Store:</label>
+                                <select id="fulfillmentStore" disabled>
+                                    <option value="">No stores configured</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <label for="fulfillmentDate">Order Date:</label>
+                                <input type="date" id="fulfillmentDate">
+                            </div>
+                            <div class="config-item">
+                                <button id="loadFulfillmentBtn" class="btn" disabled>Load Orders</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <td><strong>Organic Coffee - 500g</strong></td>
-                                    <td>15 Box</td>
-                                    <td>18 Box ⓘ</td>
-                                    <td><input type="number" value="17" class="qty-input"></td>
+                                    <th>Item Name</th>
+                                    <th>Ordered Qty</th>
+                                    <th>Received Qty</th>
+                                    <th>Pending</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5">No fulfillment orders to display</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- GRN Tracker Tab -->
+                <div id="grn-tracker" class="tab-content">
+                    <div class="upload-section">
+                        <h3>GRN Data Upload</h3>
+                        <div class="upload-area" id="grnUploadArea">
+                            <p>📄 Drag & drop GRN file or click to browse</p>
+                            <input type="file" id="grnFileInput" accept=".csv,.xlsx" style="display: none;">
+                        </div>
+                        <div id="grnUploadStatus" class="upload-status"></div>
+                    </div>
+
+                    <div class="filter-controls">
+                        <select id="grnStoreFilter" disabled>
+                            <option value="">All Stores</option>
+                        </select>
+                        <input type="date" id="grnDateFilter" disabled>
+                        <select id="grnStatusFilter" disabled>
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="received">Received</option>
+                            <option value="partial">Partial</option>
+                        </select>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>GRN No.</th>
+                                    <th>Date</th>
+                                    <th>Store</th>
+                                    <th>Supplier</th>
+                                    <th>Items</th>
+                                    <th>Total Value</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7">No GRN data uploaded yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="reports" class="tab-content">
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h3>📊 Sales Report</h3>
+                            <p>Generate detailed sales analysis and performance metrics</p>
+                            <button class="btn" disabled>Generate Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <h3>📦 Inventory Report</h3>
+                            <p>Current stock levels, turnover rates, and reorder points</p>
+                            <button class="btn" disabled>Generate Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <h3>🔄 Stock Movement</h3>
+                            <p>Track inventory movements, receipts, and adjustments</p>
+                            <button class="btn" disabled>Generate Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <h3>⚠️ Low Stock Alert</h3>
+                            <p>Items below minimum stock levels requiring attention</p>
+                            <button class="btn" disabled>Generate Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <h3>💰 Profitability Analysis</h3>
+                            <p>Margin analysis and profitability by item and category</p>
+                            <button class="btn" disabled>Generate Report</button>
+                        </div>
+
+                        <div class="report-card">
+                            <h3>📈 Trend Analysis</h3>
+                            <p>Historical trends and forecasting insights</p>
+                            <button class="btn" disabled>Generate Report</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settings" class="tab-content">
+                    <div class="settings-grid">
+                        <div class="settings-section">
+                            <h3>🏪 Store Configuration</h3>
+                            <div class="form-group">
+                                <label for="storeName">Store Name:</label>
+                                <input type="text" id="storeName" placeholder="Enter store name">
+                            </div>
+                            <div class="form-group">
+                                <label for="storeCode">Store Code:</label>
+                                <input type="text" id="storeCode" placeholder="Enter store code">
+                            </div>
+                            <div class="form-group">
+                                <label for="storeLocation">Location:</label>
+                                <input type="text" id="storeLocation" placeholder="Enter location">
+                            </div>
+                            <button id="addStoreBtn" class="btn">Add Store</button>
+                            
+                            <div class="master-table-container" id="storesTableContainer">
+                                <h4>Configured Stores</h4>
+                                <div class="data-table-container">
+                                    <table id="storesTable" class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Store Name</th>
+                                                <th>Code</th>
+                                                <th>Location</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="4">No stores configured yet</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>🏷️ Item Master</h3>
+                            <div class="form-group">
+                                <label for="itemName">Item Name:</label>
+                                <input type="text" id="itemName" placeholder="Enter item name">
+                            </div>
+                            <div class="form-group">
+                                <label for="itemCategory">Category:</label>
+                                <input type="text" id="itemCategory" placeholder="Enter category">
+                            </div>
+                            <div class="form-group">
+                                <label for="itemUnit">Unit:</label>
+                                <select id="itemUnit">
+                                    <option value="Box">Box</option>
+                                    <option value="Kg">Kg</option>
+                                    <option value="Litre">Litre</option>
+                                    <option value="Piece">Piece</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="minStock">Minimum Stock:</label>
+                                <input type="number" id="minStock" placeholder="Minimum stock level">
+                            </div>
+                            <div class="form-group">
+                                <label for="moq">MOQ (Minimum Order Quantity):</label>
+                                <input type="number" id="moq" placeholder="Minimum order quantity">
+                            </div>
+                            <button id="addItemBtn" class="btn">Add Item</button>
+                            
+                            <div class="master-table-container" id="itemsTableContainer">
+                                <h4>Item Master</h4>
+                                <div class="data-table-container">
+                                    <table id="itemsTable" class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Item Name</th>
+                                                <th>Category</th>
+                                                <th>Unit</th>
+                                                <th>Min Stock</th>
+                                                <th>MOQ</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="6">No items configured yet</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>📊 System Configuration</h3>
+                            <div class="form-group">
+                                <label for="forecastAccuracy">Forecast Accuracy (%):</label>
+                                <input type="number" id="forecastAccuracy" value="85" min="50" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="safetyStock">Safety Stock (%):</label>
+                                <input type="number" id="safetyStock" value="20" min="0" max="50">
+                            </div>
+                            <div class="form-group">
+                                <label for="reorderPoint">Reorder Point Days:</label>
+                                <input type="number" id="reorderPoint" value="7" min="1" max="30">
+                            </div>
+                            <button id="saveConfigBtn" class="btn">Save Configuration</button>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>💾 Data Management</h3>
+                            <div class="form-group">
+                                <button id="exportDataBtn" class="btn">Export All Data</button>
+                            </div>
+                            <div class="form-group">
+                                <button id="clearDataBtn" class="btn btn-secondary">Clear All Data</button>
+                            </div>
+                            <div class="form-group">
+                                <button id="resetSystemBtn" class="btn btn-secondary">Reset System</button>
+                            </div>
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                                ⚠️ Data operations cannot be undone. Please backup before clearing.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global variables
+        let appData = {
+            salesData: [],
+            stockData: [],
+            orderStockData: [], // Current stock for order calculations
+            stores: [],
+            items: [],
+            orderData: [],
+            config: {
+                forecastAccuracy: 85,
+                safetyStock: 20,
+                reorderPoint: 7
+            }
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            loadStoredData();
+            setupEventListeners();
+            updateCurrentDate();
+        });
+
+        function initializeApp() {
+            console.log('Godesi KIOSK Inventory System Initialized');
+            updateDashboard();
+        }
+
+        function updateCurrentDate() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('currentDate').textContent = dateStr;
+        }
+
+        function loadStoredData() {
+            // Load data from localStorage if available (in a real app)
+            // For demo purposes, we'll keep it empty
+            updateDashboard();
+            updateStoreDropdowns();
+        }
+
+        function setupEventListeners() {
+            // Tab navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+
+            // Mobile menu
+            document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+
+            // Upload areas
+            setupUploadArea('salesUploadArea', 'salesFileInput', handleSalesUpload);
+            setupUploadArea('stockUploadArea', 'stockFileInput', handleStockUpload);
+            setupUploadArea('orderStockUploadArea', 'orderStockFileInput', handleOrderStockUpload);
+            setupUploadArea('manualStockUploadArea', 'manualStockFileInput', handleManualStockUpload);
+            setupUploadArea('grnUploadArea', 'grnFileInput', handleGrnUpload);
+
+            // Settings
+            document.getElementById('addStoreBtn').addEventListener('click', addStore);
+            document.getElementById('addItemBtn').addEventListener('click', addItem);
+            document.getElementById('saveConfigBtn').addEventListener('click', saveConfiguration);
+            document.getElementById('clearDataBtn').addEventListener('click', clearAllData);
+            document.getElementById('resetSystemBtn').addEventListener('click', resetSystem);
+            document.getElementById('exportDataBtn').addEventListener('click', exportAllData);
+
+            // Order generation
+            document.getElementById('generateOrderBtn').addEventListener('click', generateOrder);
+            document.getElementById('exportKioskBtn').addEventListener('click', () => exportOrder('kiosk'));
+            document.getElementById('exportQsrBtn').addEventListener('click', () => exportOrder('qsr'));
+            document.getElementById('exportExcelBtn').addEventListener('click', exportExcelOrder);
+        }
+
+        function switchTab(tabId) {
+            // Remove active class from all nav items and tab contents
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Add active class to selected nav item and tab content
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'data-upload': 'Data Upload',
+                'sales-orders': 'Sales Orders',
+                'stock-reconciliation': 'Stock Reconciliation',
+                'stock-fulfillment': 'Stock Fulfillment',
+                'grn-tracker': 'GRN Tracker',
+                'reports': 'Reports',
+                'settings': 'Settings'
+            };
+            document.getElementById('pageTitle').textContent = titles[tabId] || 'Dashboard';
+
+            // Close mobile menu if open
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function setupUploadArea(areaId, inputId, handler) {
+            const area = document.getElementById(areaId);
+            const input = document.getElementById(inputId);
+
+            area.addEventListener('click', () => input.click());
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('drag-over');
+            });
+            area.addEventListener('dragleave', () => {
+                area.classList.remove('drag-over');
+            });
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handler(files[0]);
+                }
+            });
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handler(e.target.files[0]);
+                }
+            });
+        }
+
+        function handleSalesUpload(file) {
+            showUploadStatus('salesUploadStatus', 'Processing...', 'processing');
+            
+            setTimeout(() => {
+                // Simulate file processing
+                appData.salesData = generateSampleSalesData();
+                showUploadStatus('salesUploadStatus', `Successfully uploaded ${file.name}`, 'success');
+                updateDashboard();
+                updateSalesDataTable();
+                updateStoreDropdowns();
+                enableOrderGeneration();
+            }, 1500);
+        }
+
+        function handleStockUpload(file) {
+            showUploadStatus('stockUploadStatus', 'Processing...', 'processing');
+            
+            setTimeout(() => {
+                appData.stockData = generateSampleStockData();
+                showUploadStatus('stockUploadStatus', `Successfully uploaded ${file.name}`, 'success');
+                updateDashboard();
+            }, 1500);
+        }
+
+        function handleOrderStockUpload(file) {
+            showUploadStatus('orderStockUploadStatus', 'Processing current stock data...', 'processing');
+            
+            setTimeout(() => {
+                // Simulate processing current stock data
+                appData.orderStockData = generateSampleOrderStockData();
+                showUploadStatus('orderStockUploadStatus', `Successfully uploaded ${file.name} - ${appData.orderStockData.length} items processed`, 'success');
+                updateOrderGenerationStatus();
+            }, 1500);
+        }
+
+        function generateSampleOrderStockData() {
+            return [
+                { item: 'Premium Tea Bags - 100ct', currentStock: 15, unit: 'Box' },
+                { item: 'Organic Coffee - 500g', currentStock: 8, unit: 'Box' },
+                { item: 'Fresh Milk - 1L', currentStock: 25, unit: 'Litre' },
+                { item: 'Sugar - 1kg', currentStock: 12, unit: 'Kg' },
+                { item: 'Green Tea - 50ct', currentStock: 5, unit: 'Box' },
+                { item: 'Instant Coffee - 200g', currentStock: 18, unit: 'Box' }
+            ];
+        }
+
+        function handleManualStockUpload(file) {
+            showUploadStatus('manualStockUploadStatus', 'Processing...', 'processing');
+            
+            setTimeout(() => {
+                showUploadStatus('manualStockUploadStatus', `Successfully uploaded ${file.name}`, 'success');
+            }, 1500);
+        }
+
+        function handleGrnUpload(file) {
+            showUploadStatus('grnUploadStatus', 'Processing...', 'processing');
+            
+            setTimeout(() => {
+                showUploadStatus('grnUploadStatus', `Successfully uploaded ${file.name}`, 'success');
+            }, 1500);
+        }
+
+        function showUploadStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `upload-status ${type}`;
+        }
+
+        function generateSampleSalesData() {
+            const items = ['Premium Tea Bags - 100ct', 'Organic Coffee - 500g', 'Fresh Milk - 1L', 'Sugar - 1kg'];
+            const stores = ['Downtown Store', 'Mall Store', 'Airport Store'];
+            const data = [];
+            
+            for (let i = 0; i < 50; i++) {
+                data.push({
+                    date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    restaurant: stores[Math.floor(Math.random() * stores.length)],
+                    category: Math.random() > 0.5 ? 'Beverages' : 'Grocery',
+                    item: items[Math.floor(Math.random() * items.length)],
+                    qty: Math.floor(Math.random() * 10) + 1,
+                    grossSales: (Math.random() * 1000 + 100).toFixed(2)
+                });
+            }
+            return data;
+        }
+
+        function generateSampleStockData() {
+            return [
+                { item: 'Premium Tea Bags - 100ct', currentStock: 45, unit: 'Box' },
+                { item: 'Organic Coffee - 500g', currentStock: 32, unit: 'Box' },
+                { item: 'Fresh Milk - 1L', currentStock: 78, unit: 'Litre' },
+                { item: 'Sugar - 1kg', currentStock: 23, unit: 'Kg' }
+            ];
+        }
+
+        function updateDashboard() {
+            const totalRevenue = appData.salesData.reduce((sum, sale) => sum + parseFloat(sale.grossSales || 0), 0);
+            const salesRecords = appData.salesData.length;
+            const itemsTracked = new Set(appData.salesData.map(sale => sale.item)).size;
+            const activeStores = appData.stores.length;
+
+            document.getElementById('totalRevenue').textContent = totalRevenue > 0 ? `₹${totalRevenue.toLocaleString('en-IN')}` : '₹0';
+            document.getElementById('salesRecords').textContent = salesRecords;
+            document.getElementById('itemsTracked').textContent = itemsTracked;
+            document.getElementById('activeStores').textContent = activeStores;
+        }
+
+        function updateSalesDataTable() {
+            const tbody = document.querySelector('#salesDataTable tbody');
+            if (appData.salesData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No data uploaded yet. Upload sales data to see records here.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = appData.salesData.slice(0, 10).map(sale => `
+                <tr>
+                    <td>${sale.date}</td>
+                    <td>${sale.restaurant}</td>
+                    <td>${sale.category}</td>
+                    <td>${sale.item}</td>
+                    <td>${sale.qty}</td>
+                    <td>₹${sale.grossSales}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStoreDropdowns() {
+            const storeSelects = ['storeFilter', 'orderStore', 'fulfillmentStore', 'grnStoreFilter'];
+            const stores = [...new Set(appData.salesData.map(sale => sale.restaurant))];
+            
+            storeSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (stores.length > 0) {
+                    select.innerHTML = '<option value="">All Stores</option>' + 
+                        stores.map(store => `<option value="${store}">${store}</option>`).join('');
+                    select.disabled = false;
+                } else {
+                    select.innerHTML = '<option value="">No stores configured</option>';
+                    select.disabled = true;
+                }
+            });
+        }
+
+        function addStore() {
+            const name = document.getElementById('storeName').value;
+            const code = document.getElementById('storeCode').value;
+            const location = document.getElementById('storeLocation').value;
+
+            if (!name || !code || !location) {
+                alert('Please fill all store details');
+                return;
+            }
+
+            appData.stores.push({ name, code, location });
+            updateStoresTable();
+            clearStoreForm();
+            updateDashboard();
+        }
+
+        function addItem() {
+            const name = document.getElementById('itemName').value;
+            const category = document.getElementById('itemCategory').value;
+            const unit = document.getElementById('itemUnit').value;
+            const minStock = document.getElementById('minStock').value;
+            const moq = document.getElementById('moq').value;
+
+            if (!name || !category || !minStock || !moq) {
+                alert('Please fill all item details including MOQ');
+                return;
+            }
+
+            appData.items.push({ 
+                name, 
+                category, 
+                unit, 
+                minStock: parseInt(minStock),
+                moq: parseInt(moq)
+            });
+            updateItemsTable();
+            clearItemForm();
+        }
+
+        function updateStoresTable() {
+            const tbody = document.querySelector('#storesTable tbody');
+            const container = document.getElementById('storesTableContainer');
+            
+            if (appData.stores.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">No stores configured yet</td></tr>';
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            tbody.innerHTML = appData.stores.map((store, index) => `
+                <tr>
+                    <td>${store.name}</td>
+                    <td>${store.code}</td>
+                    <td>${store.location}</td>
+                    <td><button onclick="removeStore(${index})" class="btn btn-secondary">Remove</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateItemsTable() {
+            const tbody = document.querySelector('#itemsTable tbody');
+            const container = document.getElementById('itemsTableContainer');
+            
+            if (appData.items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No items configured yet</td></tr>';
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            tbody.innerHTML = appData.items.map((item, index) => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td>${item.unit}</td>
+                    <td>${item.minStock}</td>
+                    <td>${item.moq}</td>
+                    <td><button onclick="removeItem(${index})" class="btn btn-secondary">Remove</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function removeStore(index) {
+            appData.stores.splice(index, 1);
+            updateStoresTable();
+            updateDashboard();
+        }
+
+        function removeItem(index) {
+            appData.items.splice(index, 1);
+            updateItemsTable();
+        }
+
+        function clearStoreForm() {
+            document.getElementById('storeName').value = '';
+            document.getElementById('storeCode').value = '';
+            document.getElementById('storeLocation').value = '';
+        }
+
+        function clearItemForm() {
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemCategory').value = '';
+            document.getElementById('minStock').value = '';
+            document.getElementById('moq').value = '';
+        }
+
+        function enableOrderGeneration() {
+            updateOrderGenerationStatus();
+        }
+
+        function updateOrderGenerationStatus() {
+            const hasStores = appData.salesData.length > 0;
+            const hasCurrentStock = appData.orderStockData.length > 0;
+            const hasSalesData = appData.salesData.length > 0;
+            
+            const btn = document.getElementById('generateOrderBtn');
+            const status = document.getElementById('orderGenStatus');
+            
+            if (hasStores && hasCurrentStock && hasSalesData) {
+                btn.disabled = false;
+                status.textContent = '✅ Ready to generate orders with current stock calculations';
+                status.style.color = 'var(--success-color)';
+            } else if (hasStores && hasSalesData) {
+                btn.disabled = false;
+                status.textContent = '⚠️ Ready to generate orders (upload current stock for better accuracy)';
+                status.style.color = 'var(--warning-color)';
+            } else {
+                btn.disabled = true;
+                status.textContent = 'Upload sales data and configure stores first';
+                status.style.color = 'var(--text-secondary)';
+            }
+        }
+
+        function generateOrder() {
+            const store = document.getElementById('orderStore').value;
+            const period = document.getElementById('forecastPeriod').value;
+            const method = document.getElementById('forecastMethod').value;
+
+            if (!store) {
+                alert('Please select a store');
+                return;
+            }
+
+            // Calculate forecast based on sales data
+            const storeData = appData.salesData.filter(sale => sale.restaurant === store);
+            const itemForecasts = calculateForecast(storeData, period, method);
+            
+            // Generate order with current stock consideration
+            const orderItems = generateOrderCalculation(itemForecasts);
+            
+            displayOrderResults(orderItems, store);
+            enableOrderExport();
+        }
+
+        function calculateForecast(salesData, period, method) {
+            const itemSales = {};
+            
+            // Group sales by item
+            salesData.forEach(sale => {
+                if (!itemSales[sale.item]) {
+                    itemSales[sale.item] = [];
+                }
+                itemSales[sale.item].push({
+                    qty: parseInt(sale.qty) || 0,
+                    date: sale.date
+                });
+            });
+
+            const forecasts = {};
+            
+            // Calculate forecast for each item
+            Object.keys(itemSales).forEach(item => {
+                const sales = itemSales[item];
+                let forecast = 0;
+                
+                if (method === 'average') {
+                    const totalQty = sales.reduce((sum, sale) => sum + sale.qty, 0);
+                    forecast = Math.ceil(totalQty / sales.length) * (period === 'last30' ? 30 : period === 'last90' ? 90 : 30);
+                } else if (method === 'trending') {
+                    // Simple trending calculation
+                    const totalQty = sales.reduce((sum, sale) => sum + sale.qty, 0);
+                    forecast = Math.ceil((totalQty / sales.length) * 1.2) * (period === 'last30' ? 30 : period === 'last90' ? 90 : 30);
+                } else {
+                    // Seasonal adjustment
+                    const totalQty = sales.reduce((sum, sale) => sum + sale.qty, 0);
+                    forecast = Math.ceil((totalQty / sales.length) * 1.1) * (period === 'last30' ? 30 : period === 'last90' ? 90 : 30);
+                }
+                
+                forecasts[item] = Math.max(forecast, 1); // Minimum forecast of 1
+            });
+            
+            return forecasts;
+        }
+
+        function generateOrderCalculation(forecasts) {
+            const orderItems = [];
+            
+            Object.keys(forecasts).forEach(itemName => {
+                const forecast = forecasts[itemName];
+                
+                // Get MOQ from item master (default to 5 if not set)
+                const itemMaster = appData.items.find(item => item.name === itemName);
+                const moq = itemMaster ? parseInt(itemMaster.moq) || 5 : 5;
+                
+                // Get current stock (default to 0 if not available)
+                const stockItem = appData.orderStockData.find(stock => stock.item === itemName);
+                const currentStock = stockItem ? parseInt(stockItem.currentStock) || 0 : 0;
+                
+                // Calculate order quantity: Forecast + MOQ - Current Stock
+                let orderQty = forecast + moq - currentStock;
+                orderQty = Math.max(orderQty, 0); // Ensure non-negative
+                
+                // Determine trend
+                const trend = forecast > 20 ? 'increasing' : forecast < 10 ? 'decreasing' : 'stable';
+                
+                orderItems.push({
+                    name: itemName,
+                    forecast: forecast,
+                    moq: moq,
+                    currentStock: currentStock,
+                    calculatedQty: orderQty,
+                    recommendedQty: orderQty,
+                    trend: trend,
+                    unit: stockItem ? stockItem.unit : 'Box'
+                });
+            });
+            
+            return orderItems.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        function displayOrderResults(orderItems, store) {
+            const container = document.getElementById('orderResultsContainer');
+            
+            if (orderItems.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <h3>No Items to Order</h3>
+                        <p>No items found for the selected store and period</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const hasCurrentStock = appData.orderStockData.length > 0;
+            
+            container.innerHTML = `
+                <h3>Generated Order for ${store}</h3>
+                <div style="margin-bottom: 16px; padding: 12px; background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px;">
+                    <strong>Calculation Formula:</strong> 
+                    ${hasCurrentStock ? 
+                        'Order Qty = <span style="color: #0ea5e9;">Forecast</span> + <span style="color: #10b981;">MOQ</span> - <span style="color: #f59e0b;">Current Stock</span>' :
+                        'Order Qty = <span style="color: #0ea5e9;">Forecast</span> + <span style="color: #10b981;">MOQ</span> (Current stock not uploaded)'
+                    }
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Forecast</th>
+                                <th>MOQ</th>
+                                ${hasCurrentStock ? '<th>Current Stock</th>' : ''}
+                                <th>Calculated Qty</th>
+                                <th>Your Order Qty</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${orderItems.map(item => `
+                                <tr>
+                                    <td><strong>${item.name}</strong></td>
+                                    <td><span style="color: #0ea5e9;">${item.forecast} ${item.unit}</span></td>
+                                    <td><span style="color: #10b981;">${item.moq} ${item.unit}</span></td>
+                                    ${hasCurrentStock ? `<td><span style="color: #f59e0b;">${item.currentStock} ${item.unit}</span></td>` : ''}
+                                    <td><strong>${item.calculatedQty} ${item.unit}</strong></td>
+                                    <td><input type="number" value="${item.recommendedQty}" class="qty-input" data-item="${item.name}" min="0"></td>
+                                    <td>${item.trend === 'increasing' ? '📈' : item.trend === 'decreasing' ? '📉' : '➡️'} ${item.trend}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 16px; padding: 12px; background: #f9fafb; border-radius: 8px; font-size: 14px;">
+                    <strong>Legend:</strong> 
+                    <span style="color: #0ea5e9;">📈 Increasing</span> • 
+                    <span style="color: #6b7280;">➡️ Stable</span> • 
+                    <span style="color: #ef4444;">📉 Decreasing</span>
+                    ${!hasCurrentStock ? '<br><strong>Note:</strong> Upload current stock for more accurate calculations' : ''}
+                </div>
+            `;
+            
+            // Store order data for export
+            appData.orderData = orderItems.map(item => ({
+                ...item,
+                finalQty: item.recommendedQty,
+                store: store
+            }));
+        }
+
+        function enableOrderExport() {
+            document.getElementById('exportKioskBtn').disabled = false;
+            document.getElementById('exportQsrBtn').disabled = false;
+            document.getElementById('exportExcelBtn').disabled = false;
+            document.getElementById('exportStatus').textContent = '✅ Orders ready for export';
+            document.getElementById('exportStatus').style.color = 'var(--success-color)';
+        }
+
+        function exportOrder(type) {
+            if (appData.orderData.length === 0) {
+                alert('No order data to export. Please generate an order first.');
+                return;
+            }
+
+            // Update order data with user-modified quantities
+            const inputs = document.querySelectorAll('.qty-input[data-item]');
+            inputs.forEach(input => {
+                const itemName = input.getAttribute('data-item');
+                const orderItem = appData.orderData.find(item => item.name === itemName);
+                if (orderItem) {
+                    orderItem.finalQty = parseInt(input.value) || 0;
+                }
+            });
+
+            let csvContent = '';
+            const timestamp = new Date().toISOString().split('T')[0];
+            
+            if (type === 'kiosk') {
+                csvContent = 'KIOSK Order Export\n';
+                csvContent += `Store,${appData.orderData[0]?.store || 'Unknown'}\n`;
+                csvContent += `Date,${timestamp}\n\n`;
+                csvContent += 'Item Name,Forecast,MOQ,Current Stock,Order Quantity,Unit\n';
+                
+                appData.orderData.forEach(item => {
+                    csvContent += `"${item.name}",${item.forecast},${item.moq},${item.currentStock || 0},${item.finalQty},"${item.unit}"\n`;
+                });
+            } else if (type === 'qsr') {
+                csvContent = 'QSR Order Export\n';
+                csvContent += `Store,${appData.orderData[0]?.store || 'Unknown'}\n`;
+                csvContent += `Date,${timestamp}\n\n`;
+                csvContent += 'Item Name,Order Quantity,Unit,Trend\n';
+                
+                appData.orderData.forEach(item => {
+                    csvContent += `"${item.name}",${item.finalQty},"${item.unit}","${item.trend}"\n`;
+                });
+            }
+
+            // Download CSV
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${type.toUpperCase()}_Order_${timestamp}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert(`${type.toUpperCase()} order exported successfully!`);
+        }
+
+        function exportExcelOrder() {
+            if (appData.orderData.length === 0) {
+                alert('No order data to export. Please generate an order first.');
+                return;
+            }
+
+            // Update order data with user-modified quantities
+            const inputs = document.querySelectorAll('.qty-input[data-item]');
+            inputs.forEach(input => {
+                const itemName = input.getAttribute('data-item');
+                const orderItem = appData.orderData.find(item => item.name === itemName);
+                if (orderItem) {
+                    orderItem.finalQty = parseInt(input.value) || 0;
+                }
+            });
+
+            let csvContent = 'Item Name,Forecast Qty,MOQ,Current Stock,Calculated Qty,Final Order Qty,Unit,Trend,Notes\n';
+            
+            appData.orderData.forEach(item => {
+                const notes = item.currentStock > 0 ? 'With current stock' : 'No current stock data';
+                csvContent += `"${item.name}",${item.forecast},${item.moq},${item.currentStock || 0},${item.calculatedQty},${item.finalQty},"${item.unit}","${item.trend}","${notes}"\n`;
+            });
+
+            // Download CSV
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Order_Details_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('Detailed order exported to Excel format successfully!');
+        }
+
+        function exportOrder(type) {
+            const filename = `${type.toUpperCase()}_Order_${new Date().toISOString().split('T')[0]}.csv`;
+            alert(`Exporting ${filename}...`);
+        }
+
+        function saveConfiguration() {
+            appData.config.forecastAccuracy = parseInt(document.getElementById('forecastAccuracy').value);
+            appData.config.safetyStock = parseInt(document.getElementById('safetyStock').value);
+            appData.config.reorderPoint = parseInt(document.getElementById('reorderPoint').value);
+            
+            alert('Configuration saved successfully!');
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                appData.salesData = [];
+                appData.stockData = [];
+                appData.orderStockData = [];
+                appData.orderData = [];
+                updateDashboard();
+                updateSalesDataTable();
+                updateOrderGenerationStatus();
+                alert('All data cleared successfully!');
+            }
+        }
+
+        function resetSystem() {
+            if (confirm('Are you sure you want to reset the entire system? This will clear all data and settings.')) {
+                appData = {
+                    salesData: [],
+                    stockData: [],
+                    orderStockData: [],
+                    stores: [],
+                    items: [],
+                    orderData: [],
+                    config: { forecastAccuracy: 85, safetyStock: 20, reorderPoint: 7 }
+                };
+                updateDashboard();
+                updateSalesDataTable();
+                updateStoresTable();
+                updateItemsTable();
+                updateOrderGenerationStatus();
+                alert('System reset successfully!');
+            }
+        }
+
+        function exportAllData() {
+            const dataToExport = {
+                exportDate: new Date().toISOString(),
+                ...appData
+            };
+            
+            const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Godesi_KIOSK_Data_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Make functions available globally for onclick handlers
+        window.removeStore = removeStore;
+        window.removeItem = removeItem;
+    </script>
+</body>
+</html>
